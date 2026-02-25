@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Terminal, Cpu, Zap, Activity, BookOpen, X, Play, RotateCcw, ArrowLeft, GraduationCap, Volume2, VolumeX } from 'lucide-react';
+import { Terminal, Cpu, Zap, Activity, BookOpen, X, Play, RotateCcw, ArrowLeft, GraduationCap, Volume2, VolumeX, Calculator } from 'lucide-react';
 import Tutorial from './Tutorial';
 import { useLang } from '../LanguageContext';
 
@@ -18,7 +18,7 @@ interface Task {
   speed: number;
   text: string;
   answer: string;
-  type: 'math' | 'binary' | 'hex' | 'modulo' | 'number' | 'powerup';
+  type: 'math' | 'number' | 'powerup';
   color: string;
   powerUp?: PowerUpType;
 }
@@ -66,9 +66,16 @@ const generateTask = (level: number, width: number, difficulty: Difficulty, mode
   let task: Task;
 
   if (mode === 'stream') {
-    // Data Stream Mode: Just numbers
-    const length = randomInt(1, 3); // Random 1 to 3 digits
-    const min = Math.pow(10, length - 1);
+    // Data Stream Mode: Just numbers, digit count based on difficulty
+    let length: number;
+    if (difficulty === 'easy') {
+      length = 1; // 1-digit numbers (1-9)
+    } else if (difficulty === 'medium') {
+      length = 2; // 2-digit numbers (10-99)
+    } else {
+      length = randomInt(1, 3); // Mixed 1-3 digit numbers
+    }
+    const min = length === 1 ? 1 : Math.pow(10, length - 1);
     const max = Math.pow(10, length) - 1;
     const num = randomInt(min, max);
     const text = num.toString();
@@ -88,52 +95,70 @@ const generateTask = (level: number, width: number, difficulty: Difficulty, mode
       color: '#06b6d4', // Cyan
     };
   } else {
-    // CPU Overload Mode: Math & Logic
-    const types: ('math' | 'binary' | 'hex' | 'modulo')[] = ['math'];
-    if (level >= 2) types.push('binary');
-    if (level >= 3) types.push('modulo');
-    if (level >= 4) types.push('hex');
-
-    const type = types[randomInt(0, types.length - 1)];
+    // CPU Overload Mode: Arithmetic, scaled by difficulty
     let text = '';
     let answer = '';
-    let color = '#3b82f6'; // blue-500
+    const color = '#3b82f6'; // Blue
 
-    switch (type) {
-      case 'math':
-        const op = Math.random() > 0.5 ? '+' : '-';
-        const a = randomInt(1, 20 + level * 5);
-        const b = randomInt(1, 20 + level * 5);
-        if (op === '+') {
+    if (difficulty === 'easy') {
+      // Easy: 1-digit OP 1-digit, operators: +, -, *, /
+      const ops = ['+', '-', '*', '/'];
+      const op = ops[randomInt(0, ops.length - 1)];
+      let a = randomInt(1, 9);
+      let b = randomInt(1, 9);
+
+      if (op === '/') {
+        // Ensure clean division: pick b first, then a = b * quotient
+        b = randomInt(1, 9);
+        const quotient = randomInt(1, 9);
+        a = b * quotient;
+      }
+
+      switch (op) {
+        case '+':
           text = `${a} + ${b}`;
           answer = (a + b).toString();
-        } else {
-          const max = Math.max(a, b);
-          const min = Math.min(a, b);
-          text = `${max} - ${min}`;
-          answer = (max - min).toString();
+          break;
+        case '-': {
+          const hi = Math.max(a, b);
+          const lo = Math.min(a, b);
+          text = `${hi} - ${lo}`;
+          answer = (hi - lo).toString();
+          break;
         }
-        color = '#3b82f6'; // Blue
-        break;
-      case 'binary':
-        const binVal = randomInt(1, 15 + level * 2);
-        text = `0b${binVal.toString(2)}`;
-        answer = binVal.toString();
-        color = '#10b981'; // Green
-        break;
-      case 'hex':
-        const hexVal = randomInt(10, 30 + level * 5);
-        text = `0x${hexVal.toString(16).toUpperCase()}`;
-        answer = hexVal.toString();
-        color = '#a855f7'; // Purple
-        break;
-      case 'modulo':
-        const div = randomInt(2, 5 + Math.floor(level / 2));
-        const num = randomInt(10, 50 + level * 5);
-        text = `${num} % ${div}`;
-        answer = (num % div).toString();
-        color = '#f59e0b'; // Amber
-        break;
+        case '*':
+          text = `${a} × ${b}`;
+          answer = (a * b).toString();
+          break;
+        case '/':
+          text = `${a} ÷ ${b}`;
+          answer = (a / b).toString();
+          break;
+      }
+    } else if (difficulty === 'medium') {
+      // Medium: 2-digit OP 1-digit, operators: + and - only
+      const op = Math.random() > 0.5 ? '+' : '-';
+      const a = randomInt(10, 99);
+      const b = randomInt(1, 9);
+      if (op === '+') {
+        text = `${a} + ${b}`;
+        answer = (a + b).toString();
+      } else {
+        text = `${a} - ${b}`;
+        answer = (a - b).toString();
+      }
+    } else {
+      // Hard: 3-digit OP 1-digit, operators: + and - only
+      const op = Math.random() > 0.5 ? '+' : '-';
+      const a = randomInt(100, 999);
+      const b = randomInt(1, 9);
+      if (op === '+') {
+        text = `${a} + ${b}`;
+        answer = (a + b).toString();
+      } else {
+        text = `${a} - ${b}`;
+        answer = (a - b).toString();
+      }
     }
 
     // Ensure text fits within canvas width (approx char width 12px)
@@ -147,7 +172,7 @@ const generateTask = (level: number, width: number, difficulty: Difficulty, mode
       speed,
       text,
       answer,
-      type,
+      type: 'math',
       color,
     };
   }
@@ -784,32 +809,10 @@ export default function Game() {
                 <p className="text-gray-400 mb-8">{t('subtitle')}</p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                  {/* CPU Overload Card */}
-                  <button
-                    onClick={() => setGameMode('cpu')}
-                    className={`p-6 rounded-xl border-2 transition-all text-left group ${gameMode === 'cpu'
-                      ? 'border-blue-500 bg-blue-500/10 shadow-[0_0_20px_rgba(59,130,246,0.2)]'
-                      : 'border-gray-800 bg-gray-900/50 hover:border-gray-600'
-                      }`}
-                  >
-                    <div className="flex items-center gap-3 mb-3">
-                      <Cpu className={`w-6 h-6 ${gameMode === 'cpu' ? 'text-blue-400' : 'text-gray-500'}`} />
-                      <div>
-                        <h3 className={`font-bold text-lg leading-none ${gameMode === 'cpu' ? 'text-white' : 'text-gray-300'}`}>{t('cpuOverload')}</h3>
-                        <div className="text-xs text-gray-500 mt-1 font-mono">
-                          {t('highScore')} ({t(difficulty as 'easy' | 'medium' | 'hard')}): {highScores.cpu[difficulty]}
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-sm text-gray-500 group-hover:text-gray-400 transition-colors">
-                      {t('cpuDesc')}
-                    </p>
-                  </button>
-
                   {/* Data Stream Card */}
                   <button
                     onClick={() => setGameMode('stream')}
-                    className={`p-6 rounded-xl border-2 transition-all text-left group ${gameMode === 'stream'
+                    className={`p-6 rounded-xl border-2 transition-all text-left text-top group ${gameMode === 'stream'
                       ? 'border-cyan-500 bg-cyan-500/10 shadow-[0_0_20px_rgba(6,182,212,0.2)]'
                       : 'border-gray-800 bg-gray-900/50 hover:border-gray-600'
                       }`}
@@ -827,6 +830,29 @@ export default function Game() {
                       {t('streamDesc')}
                     </p>
                   </button>
+
+                  {/* CPU Overload Card */}
+                  <button
+                    onClick={() => setGameMode('cpu')}
+                    className={`p-6 rounded-xl border-2 transition-all text-left group ${gameMode === 'cpu'
+                      ? 'border-blue-500 bg-blue-500/10 shadow-[0_0_20px_rgba(59,130,246,0.2)]'
+                      : 'border-gray-800 bg-gray-900/50 hover:border-gray-600'
+                      }`}
+                  >
+                    <div className="flex items-center gap-3 mb-3">
+                      <Calculator className={`w-6 h-6 ${gameMode === 'cpu' ? 'text-blue-400' : 'text-gray-500'}`} />
+                      <div>
+                        <h3 className={`font-bold text-lg leading-none ${gameMode === 'cpu' ? 'text-white' : 'text-gray-300'}`}>{t('cpuOverload')}</h3>
+                        <div className="text-xs text-gray-500 mt-1 font-mono">
+                          {t('highScore')} ({t(difficulty as 'easy' | 'medium' | 'hard')}): {highScores.cpu[difficulty]}
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-sm text-gray-500 group-hover:text-gray-400 transition-colors">
+                      {t('cpuDesc')}
+                    </p>
+                  </button>
+
                 </div>
 
                 <div className="flex justify-center gap-2 mb-8">
@@ -968,50 +994,7 @@ export default function Game() {
                 <p className="text-gray-600 text-[10px] pt-1">{t('powerGlowHint')}</p>
               </div>
             </section>
-            <section>
-              <h4 className="text-sm font-bold text-green-500 uppercase tracking-wider mb-3 border-b border-green-500/20 pb-2">{t('binaryTitle')}</h4>
-              <p className="text-xs text-gray-400 mb-3">{t('binaryPrefix')}<code className="text-green-400">0b</code>{t('binaryDesc')}</p>
-              <div className="grid grid-cols-2 gap-2 text-sm font-mono">
-                <div className="bg-gray-900 p-2 rounded">0b1 = 1</div>
-                <div className="bg-gray-900 p-2 rounded">0b10 = 2</div>
-                <div className="bg-gray-900 p-2 rounded">0b11 = 3</div>
-                <div className="bg-gray-900 p-2 rounded">0b100 = 4</div>
-                <div className="bg-gray-900 p-2 rounded">0b101 = 5</div>
-                <div className="bg-gray-900 p-2 rounded">0b1000 = 8</div>
-              </div>
-            </section>
 
-            <section>
-              <h4 className="text-sm font-bold text-purple-500 uppercase tracking-wider mb-3 border-b border-purple-500/20 pb-2">{t('hexTitle')}</h4>
-              <p className="text-xs text-gray-400 mb-3">{t('hexPrefix')}<code className="text-purple-400">0x</code>{t('hexDesc')}</p>
-              <div className="grid grid-cols-2 gap-2 text-sm font-mono">
-                <div className="bg-gray-900 p-2 rounded">0xA = 10</div>
-                <div className="bg-gray-900 p-2 rounded">0xB = 11</div>
-                <div className="bg-gray-900 p-2 rounded">0xC = 12</div>
-                <div className="bg-gray-900 p-2 rounded">0xF = 15</div>
-                <div className="bg-gray-900 p-2 rounded">0x10 = 16</div>
-                <div className="bg-gray-900 p-2 rounded">0x1F = 31</div>
-              </div>
-            </section>
-
-            <section>
-              <h4 className="text-sm font-bold text-amber-500 uppercase tracking-wider mb-3 border-b border-amber-500/20 pb-2">{t('moduloTitle')}</h4>
-              <p className="text-xs text-gray-400 mb-3">{t('moduloDesc')}</p>
-              <div className="space-y-2 text-sm font-mono">
-                <div className="bg-gray-900 p-2 rounded flex justify-between">
-                  <span>10 % 3</span>
-                  <span className="text-amber-500">1</span>
-                </div>
-                <div className="bg-gray-900 p-2 rounded flex justify-between">
-                  <span>15 % 5</span>
-                  <span className="text-amber-500">0</span>
-                </div>
-                <div className="bg-gray-900 p-2 rounded flex justify-between">
-                  <span>7 % 2</span>
-                  <span className="text-amber-500">1</span>
-                </div>
-              </div>
-            </section>
           </div>
         </div>
       </div>

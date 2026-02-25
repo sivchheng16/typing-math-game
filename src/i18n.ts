@@ -20,19 +20,19 @@ const translations = {
         doubleScore: '2X SCORE',
 
         // ── Main Menu ───────────────────────────────────────────
-        sysInit: 'SYSTEM INITIALIZATION',
-        subtitle: "Type fast. Don't let anything breach the buffer.",
-        cpuOverload: 'CPU Overload',
-        dataStream: 'Data Stream',
+        sysInit: 'Mathematics',
+        subtitle: "Resolve quickly - type the result before it's out.",
+        cpuOverload: 'Calculate numbers',
+        dataStream: 'Speed Type',
         highScore: 'High Score',
-        cpuDesc: 'Math & logic equations fall from above. Type the answer to destroy them — before they hit the bottom.',
-        streamDesc: 'Number packets rain down. Type the 1–3 digit number exactly as it appears — pure speed and accuracy.',
+        cpuDesc: 'Calculate the number that falls. Solve each number before it go out! The bigger the number, the harder the solution.',
+        streamDesc: 'Type the numbers that fall. Enter each number accurately! No need to calculate, just speed and a sharp eye.',
         easy: 'EASY',
         medium: 'MEDIUM',
         hard: 'HARD',
-        initCpu: 'INITIALIZE CPU',
-        initStream: 'INITIALIZE STREAM',
-        trainingProtocol: 'TRAINING PROTOCOL',
+        initCpu: 'START MATH',
+        initStream: 'START TYPING',
+        trainingProtocol: 'TUTORIAL',
 
         // ── Gameplay ─────────────────────────────────────────────
         typeAnswer: 'Type answer...',
@@ -61,8 +61,8 @@ const translations = {
         moduloDesc: 'The remainder after division.',
 
         // ── Game Over ────────────────────────────────────────────
-        sysCrashed: 'SYSTEM CRASHED',
-        bufferOverflow: 'Buffer overflow detected.',
+        sysCrashed: 'BUFFER OVERFLOW',
+        bufferOverflow: 'Too many equations breached the line.',
         finalScore: 'Final Score',
         levelReached: 'Level Reached',
         newHighScore: 'NEW HIGH SCORE!',
@@ -73,7 +73,7 @@ const translations = {
         returnMenu: 'RETURN TO MENU',
 
         // ── Tutorial ─────────────────────────────────────────────
-        trainingProtocolTitle: 'TRAINING PROTOCOL',
+        trainingProtocolTitle: 'TUTORIAL',
         exitTraining: 'EXIT TRAINING',
         continue: 'CONTINUE',
         incorrectKey: 'INCORRECT KEY',
@@ -90,8 +90,8 @@ const translations = {
         t7Title: 'Training Complete',
 
         // Tutorial step content
-        t1Content: 'Welcome, Operator. Equations and number sequences will fall from above — type the correct answer and press nothing else to neutralize them before they breach the buffer.',
-        t2Content: 'Place your fingers on the Home Row (A-S-D-F and J-K-L-;). This is your base of operations. Always return here between keystrokes.',
+        t1Content: 'Welcome, students. Equations and sequences will fall from the top and end at the bottom. Please enter the correct answers before they break the buffer.',
+        t2Content: 'Place your fingers on the keyboard in the Home row (A-S-D-F and J-K-L-;). This is the basis for your finger movements on the keyboard.',
         t3Content: 'Reach up from the Home Row to strike the number keys (1-0). Keep your eyes on the screen, not your fingers.',
         t4Content: 'Type each number using the correct LEFT hand finger shown below. The highlighted key is your target.',
         t5Content: 'Now switch to your RIGHT hand. Type each number as it lights up — return to home row after each strike.',
@@ -126,19 +126,19 @@ const translations = {
         doubleScore: 'x2 ពិន្ទុ',
 
         // ── Main Menu ───────────────────────────────────────────
-        sysInit: 'ការចាប់ផ្ដើមប្រព័ន្ធ',
-        subtitle: 'វាយឱ្យបានលឿន! កុំឱ្យអ្វីបំពានខ្ទប់!',
-        cpuOverload: 'ការផ្ទុកលើស CPU',
-        dataStream: 'ស្ទ្រីមទិន្នន័យ',
+        sysInit: 'គណិតវិទ្យា',
+        subtitle: 'ដោះស្រាយឱ្យលឿន! វាយលទ្ធផលមុនពេលវាចេញក្រៅ!',
+        cpuOverload: 'គណនាលេខ',
+        dataStream: 'វាយលឿន',
         highScore: 'ពិន្ទុខ្ពស់បំផុត',
-        cpuDesc: 'សមីការគណិតវិទ្យានិងតក្កវិជ្ជាធ្លាក់ចុះ។ វាយចម្លើយដើម្បីបំបែករបស់ពួកវា — មុននឹងវាដល់បាត!',
-        streamDesc: 'ខ្សែស្រឡាយលេខជួរតូចៗធ្លាក់ចុះ។ វាយលេខ ១-៣ ខ្ទង់ឱ្យត្រឹមត្រូវ — ល្បឿននិងភាពត្រឹមត្រូវ!',
+        cpuDesc: 'គណនាចំនួនដែលធ្លាក់។ ដោះស្រាយលេខនីមួយៗមុនពេលវាចេញក្រៅ! លេខកាន់តែធំ ដំណោះស្រាយកាន់តែពិបាក!',
+        streamDesc: 'វាយបញ្ចូលលេខដែលធ្លាក់។ បញ្ចូលលេខនីមួយៗឲ្យបានត្រឹមត្រូវ! មិនចាំបាច់គណនាទេ គ្រាន់តែមានល្បឿននិងការសង្កេត!',
         easy: 'ងាយ',
         medium: 'មធ្យម',
         hard: 'ពិបាក',
-        initCpu: 'ចាប់ផ្ដើម CPU',
-        initStream: 'ចាប់ផ្ដើមស្ទ្រីម',
-        trainingProtocol: 'វិធីសាស្ត្រហ្វឹកហ្វឺន',
+        initCpu: 'ចាប់ផ្ដើមគណិត',
+        initStream: 'ចាប់ផ្ដើមវាយ',
+        trainingProtocol: 'មេរៀន',
 
         // ── Gameplay ─────────────────────────────────────────────
         typeAnswer: 'វាយចម្លើយ...',
@@ -167,8 +167,8 @@ const translations = {
         moduloDesc: 'សំណល់បន្ទាប់ពីការចែក។',
 
         // ── Game Over ────────────────────────────────────────────
-        sysCrashed: 'ប្រព័ន្ធបានគាំ',
-        bufferOverflow: 'បានរកឃើញការហូរលើសខ្ទប់។',
+        sysCrashed: 'ខ្ទប់បានហូរលើស',
+        bufferOverflow: 'សមីការច្រើនពេកបានឆ្លងកាត់បន្ទាត់។',
         finalScore: 'ពិន្ទុចុងក្រោយ',
         levelReached: 'កម្រិតដែលបានឈានដល់',
         newHighScore: 'ពិន្ទុខ្ពស់ថ្មី!',
@@ -179,7 +179,7 @@ const translations = {
         returnMenu: 'ត្រឡប់ទៅម៉ឺនុយ',
 
         // ── Tutorial ─────────────────────────────────────────────
-        trainingProtocolTitle: 'វិធីសាស្ត្រហ្វឹកហ្វឺន',
+        trainingProtocolTitle: 'មេរៀន',
         exitTraining: 'ចេញពីការហ្វឹកហ្វឺន',
         continue: 'បន្ត',
         incorrectKey: 'គ្រាប់ចុចខុស',
@@ -196,13 +196,14 @@ const translations = {
         t7Title: 'ការហ្វឹកហ្វឺនបានបញ្ចប់',
 
         // Tutorial step content
-        t1Content: 'សូមស្វាគមន៍, ប្រតិបត្ដិករ! សមីការនិងលំដាប់លេខនឹងធ្លាក់ចុះពីខាងលើ — វាយចម្លើយត្រឹមត្រូវ ហើយចុចគ្មានអ្វីទៀត ដើម្បីបញ្ឈប់ពួកគេ មុននឹងពួកគេបំពានខ្ទប់!',
-        t2Content: 'ដាក់ម្រាមមдето​របស់អ្នកនៅជួរផ្ទះ (A-S-D-F និង J-K-L-;)។ នេះជាមូលដ្ឋានប្រតិបត្ដិការ។ ត្រឡប់មកទីនេះវិញរៀងរាល់ការចុចគ្រាប់ចុច!',
-        t3Content: 'ដៃបែរពីជួរផ្ទះដើម្បីចុចគ្រាប់ចុចលេខ (1-0)។ រក្សាការផ្ដោតសំខាន់លើអេក្រង់ មិនមែននៅម្រាម!',
-        t4Content: 'វាយលេខម្ដងៗដោយប្រើម្រាមដៃឆ្វេងត្រឹមត្រូវដែលបានបង្ហាញ។ គ្រាប់ចុចភ្លឺជាគោលដៅ!',
-        t5Content: 'ឥឡូវវ៉ែតទៅដៃស្ដាំ។ វាយលេខម្ដងៗដែលភ្លឺ — ត្រឡប់ទៅជួរផ្ទះបន្ទាប់ពីការចុចនីមួយ!',
-        t6Content: 'លំហាត់ចុងក្រោយ — ត្រូវការដៃទាំងពីរ! នេះជាការក្លែងក្លាយល្អបំផុតនៃការលេងពិត! នៅស្ងប់ ហើយវាយឱ្យស្ថែរ!',
-        t7Content: 'ប្រព័ន្ធរួចរាល់! គន្លឹះខ្លះៗ មុននឹងអ្នកចូលលេង:\n• ចម្លើយត្រឹមត្រូវស្ដារភាពត្រឹមត្រូវខ្ទប់\n• អានុភាព (យឺត ⏱, ខែល 🛡, x2 ⚡) លេចឡើងនៅសមីការពិសេស — ផ្ដល់អាទិភាពដល់ពួកគេ\n• ឡើងកម្រិតរៀងរាល់ ៥០០ ពិន្ទុ ដើម្បីបង្កើតជីវិត\n• ចុច R ចាប់ផ្ដើមម្ដងទៀត, ESC ម៉ឺនុយ, M បិទសំឡេង',
+        t1Content: 'សូមស្វាគមន៍ សិស្សានុសិស្ស។ សមីការ និងលំដាប់នឹងធ្លាក់ពីខាងលើ ហើយបញ្ចប់នៅខាងក្រោម។ សូមវាយបញ្ចូលចម្លើយដែលត្រឹមត្រូវ មុនពេលពួកវាបំបែកសតិ!',
+        t2Content: 'ដាក់ម្រាមដៃរបស់អ្នកនៅលើក្តារចុចនៅជួរ Home (A-S-D-F និង J-K-L-;)។ នេះគឺជាមូលដ្ឋាននៃប្រតិបត្តិការម្រាមដៃរបស់អ្នកនៅលើក្តារចុច!',
+        t3Content: 'លើកម្រាមដៃពីជួរកណ្តាល (Home Row) ទៅវាយលេខ (១-០)។ ព្យាយាមមើលតែលើអេក្រង់ កុំមើលដៃ!',
+        t4Content: 'វាយលេខនីមួយៗដោយប្រើម្រាម ដៃឆ្វេង ឲ្យបានត្រឹមត្រូវតាមរូបខាងក្រោម។ មើលប៊ូតុងដែលលោតពន្លឺ ជាគោលដៅរបស់អ្នក!',
+        t5Content: 'ឥឡូវប្តូរមកប្រើ ដៃស្តាំ វិញម្តង។ វាយលេខណាដែលលោតពន្លឺឡើង ហើយត្រូវដាក់ម្រាមដៃមក ជួរកណ្តាល វិញរាល់ពេលវាយរួច!',
+        t6Content: 'វគ្គចុងក្រោយ — ត្រូវប្រើ ដៃទាំងពីរ។ នេះគឺជាការអនុវត្តដូចពេលលេងហ្គេមពិតៗអញ្ចឹង។ រក្សាស្មារតីឲ្យស្ងប់ ហើយវាយឲ្យទៀងទាត់!',
+        t7Content: `ប្រព័ន្ធដំណើរការហើយ! គន្លឹះខ្លះៗមុនពេលចាប់ផ្តើម៖ 
+        - ឆ្លើយត្រូវ នឹងជួយបំពេញ Buffer (ថាមពលការពារ) ឡើងវិញរូបសញ្ញាជំនួយ (យឺត ⏱, របាំងការពារ 🛡, មេគុណ២ ⚡) នឹងចេញមកតាមលេខពិសេស — ត្រូវប្រញាប់វាយយកវាឡើងវគ្គថ្មីរាល់ពេលបាន ៥០០ ពិន្ទុ ដើម្បីទទួលបានឈាមបន្ថែមចុច R ដើម្បីលេងឡើងវិញ, ESC ដើម្បីមើលម៉ឺនុយ, M ដើម្បីបិទសំឡេង`,
 
         // Finger names
         lPinky: 'កូនម្រាមឆ្វេង',
