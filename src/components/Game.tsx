@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Terminal, Cpu, Zap, Activity, BookOpen, X, Play, RotateCcw, ArrowLeft, GraduationCap, Volume2, VolumeX, Calculator } from 'lucide-react';
+import { Terminal, Cpu, Zap, Activity, BookOpen, X, Play, RotateCcw, ArrowLeft, GraduationCap, Volume2, VolumeX, Calculator, Brain, Pause, HeartPulse } from 'lucide-react';
 import Tutorial from './Tutorial';
 import { useLang } from '../LanguageContext';
 
 // --- Types ---
 
-type GameState = 'menu' | 'playing' | 'gameover' | 'tutorial';
+type GameState = 'menu' | 'playing' | 'gameover' | 'tutorial' | 'paused';
 type Difficulty = 'easy' | 'medium' | 'hard';
 type GameMode = 'cpu' | 'stream';
 type PowerUpType = 'slow' | 'shield' | 'double';
@@ -50,9 +50,9 @@ const CANVAS_WIDTH = 800;
 const CANVAS_HEIGHT = 700;
 
 const DIFFICULTY_CONFIG = {
-  easy: { spawnRate: 3000, speedBase: 0.5, speedInc: 0.1 },
-  medium: { spawnRate: 2500, speedBase: 0.7, speedInc: 0.2 },
-  hard: { spawnRate: 2000, speedBase: 0.9, speedInc: 0.3 },
+  easy: { spawnRate: 2500, speedBase: 0.5, speedInc: 0.1 },
+  medium: { spawnRate: 3500, speedBase: 0.4, speedInc: 0.1 },
+  hard: { spawnRate: 6000, speedBase: 0.2, speedInc: 0.1 },
 };
 
 // --- Helper Functions ---
@@ -213,6 +213,14 @@ export default function Game() {
     };
   });
 
+  const togglePause = useCallback(() => {
+    setGameState(prev => {
+      if (prev === 'playing') return 'paused';
+      if (prev === 'paused') return 'playing';
+      return prev;
+    });
+  }, []);
+
   // Update current time for UI timers
   useEffect(() => {
     const interval = setInterval(() => setCurrentTime(Date.now()), 100);
@@ -285,15 +293,21 @@ export default function Game() {
             setGameState('menu');
           }
           break;
-        case 'r':
+        // case 'r':
         case 'R':
           if (gameState === 'playing' || gameState === 'gameover') {
             startGame();
           }
           break;
-        case 'm':
+        // case 'm':
         case 'M':
           setSoundEnabled(prev => !prev);
+          break;
+        // case 'p':
+        case 'P':
+          if (gameState === 'playing' || gameState === 'paused') {
+            togglePause();
+          }
           break;
       }
     };
@@ -449,7 +463,7 @@ export default function Game() {
           task.y += task.speed * timeScale;
 
           // Draw Task
-          ctx.font = '20px "JetBrains Mono", monospace';
+          ctx.font = 'bold 30px "Inter", "Kantumruy Pro", sans-serif';
 
           // Check for matching prefix
           const isMatching = stateRef.current.inputValue.length > 0 &&
@@ -501,7 +515,7 @@ export default function Game() {
             ctx.lineWidth = 2;
 
             const label = `${icon} ${powerUpText}`;
-            ctx.font = 'bold 12px "JetBrains Mono", monospace';
+            ctx.font = 'bold 12px "Inter", "Kantumruy Pro", sans-serif';
             const labelMetrics = ctx.measureText(label);
             const w = labelMetrics.width + 20;
             const h = 26;
@@ -538,7 +552,7 @@ export default function Game() {
           }
 
           // Draw main task text
-          ctx.font = '20px "JetBrains Mono", monospace';
+          ctx.font = 'bold 30px "Inter", "Kantumruy Pro", sans-serif';
           if (isMatching) {
             ctx.fillStyle = '#ffffff'; // Highlight color
             ctx.shadowBlur = 20;
@@ -619,7 +633,7 @@ export default function Game() {
       {/* Navbar */}
       <nav className="bg-[#151619] border-b border-gray-800 p-4 flex justify-between items-center shrink-0 z-30 shadow-md">
         <div className="flex items-center gap-6">
-          {gameState !== 'menu' && (
+          {/* {gameState !== 'menu' && (
             <button
               onClick={() => setGameState('menu')}
               className="bg-[#0a0a0a] border border-gray-700 p-2 rounded-lg flex items-center gap-2 hover:bg-gray-800 transition-colors text-gray-400 hover:text-white"
@@ -627,7 +641,23 @@ export default function Game() {
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
-          )}
+          )} */}
+
+          {/* Logo & Name */}
+          <div className="flex items-center gap-3 pr-6 border-r border-gray-800">
+            <div className="bg-blue-500/10 p-2 rounded-lg border border-blue-500/20">
+              <img
+                src="/typing-math-game-logo.png"
+                alt="Logo"
+                className="w-6 h-6 object-contain"
+              />
+
+            </div>
+
+            <span className="font-bold text-lg tracking-tight hidden md:block">
+              {t('sysInit')}
+            </span>
+          </div>
 
           {/* Score */}
           <div className="flex items-center gap-3">
@@ -662,7 +692,18 @@ export default function Game() {
           </div>
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-3">
+          {/* Pause Toggle */}
+          {(gameState === 'playing' || gameState === 'paused') && (
+            <button
+              onClick={togglePause}
+              className="p-2 rounded-lg border border-gray-800 hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
+              title={gameState === 'playing' ? t('pause') : t('resume')}
+            >
+              {gameState === 'playing' ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+            </button>
+          )}
+
           {/* Sound Toggle */}
           <button
             onClick={() => setSoundEnabled(!soundEnabled)}
@@ -724,7 +765,7 @@ export default function Game() {
           {/* Health */}
           <div className="flex items-center gap-3 border-l border-gray-800 pl-6">
             <div className={`p-2 rounded-lg border ${health < 30 ? 'bg-red-500/10 border-red-500/20' : 'bg-green-500/10 border-green-500/20'}`}>
-              <Activity className={`${health < 30 ? 'text-red-500 animate-pulse' : 'text-green-500'} w-5 h-5`} />
+              <HeartPulse className={`${health < 30 ? 'text-red-500 animate-pulse' : 'text-green-500'} w-5 h-5`} />
             </div>
             <div className="w-32">
               <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 font-bold">{t('bufferIntegrity')}</div>
@@ -785,8 +826,9 @@ export default function Game() {
           {/* Keyboard Shortcuts Hint */}
           <div className="flex justify-center gap-6  mt-3 text-[10px] text-gray-500 font-mono uppercase tracking-wider">
             <span className="flex items-center gap-1"><kbd className="bg-gray-800 px-1.5 py-0.5 rounded border border-gray-700 text-gray-300">ESC</kbd> {t('escMenu')}</span>
-            <span className="flex items-center gap-1"><kbd className="bg-gray-800 px-1.5 py-0.5 rounded border border-gray-700 text-gray-300">R</kbd> {t('restart')}</span>
-            <span className="flex items-center gap-1"><kbd className="bg-gray-800 px-1.5 py-0.5 rounded border border-gray-700 text-gray-300">M</kbd> {t('mute')}</span>
+            <span className="flex items-center gap-1"><kbd className="bg-gray-800 px-1.5 py-0.5 rounded border border-gray-700 text-gray-300">SHIFT + R</kbd> {t('restart')}</span>
+            <span className="flex items-center gap-1"><kbd className="bg-gray-800 px-1.5 py-0.5 rounded border border-gray-700 text-gray-300">SHIFT + M</kbd> {t('mute')}</span>
+            <span className="flex items-center gap-1"><kbd className="bg-gray-800 px-1.5 py-0.5 rounded border border-gray-700 text-gray-300">SHIFT + P</kbd> {t('pause')}</span>
           </div>
         </div>
 
@@ -799,13 +841,15 @@ export default function Game() {
               exit={{ opacity: 0 }}
               className="absolute inset-0 flex items-center justify-center bg-black/80 z-50 backdrop-blur-sm"
             >
-              <div className="bg-[#151619] border border-gray-700 p-8 rounded-2xl max-w-2xl w-full text-center shadow-2xl">
+              <div className="relative bg-[#151619] border border-gray-700 p-8 rounded-2xl max-w-2xl w-full text-center shadow-2xl">
                 <div className="mb-6 flex justify-center">
-                  <div className="w-20 h-20 bg-blue-500/10 rounded-full flex items-center justify-center border border-blue-500/30">
-                    <Zap className="w-10 h-10 text-blue-500" />
-                  </div>
+                  <img
+                    src="/typing-math-game-logo.png"
+                    alt="Typing Math Game Logo"
+                    className="w-48 h-auto object-contain drop-shadow-[0_0_15px_rgba(34,211,238,0.4)]"
+                  />
                 </div>
-                <h1 className="text-4xl font-bold mb-2 tracking-tight">{t('sysInit')}</h1>
+                {/* <h1 className="text-4xl font-bold mb-2 tracking-tight">{t('sysInit')}</h1> */}
                 <p className="text-gray-400 mb-8">{t('subtitle')}</p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -890,6 +934,11 @@ export default function Game() {
                     {t('trainingProtocol')}
                   </button>
                 </div>
+
+                <div className="absolute  bottom-1 left-0 right-0 text-[10px] text-gray-600  uppercase tracking-[0.2em]">
+                  &copy; 2026 All rights reserved by KOOMPI
+                </div>
+
               </div>
             </motion.div>
           )}
@@ -959,6 +1008,41 @@ export default function Game() {
               </div>
             </motion.div>
           )}
+          {gameState === 'paused' && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 flex items-center justify-center bg-black/60 z-50 backdrop-blur-md"
+            >
+              <div className="bg-[#151619] border border-gray-700 p-8 rounded-2xl max-w-sm w-full text-center shadow-2xl">
+                <div className="mb-6 flex justify-center">
+                  <div className="w-20 h-20 bg-blue-500/10 rounded-full flex items-center justify-center border border-blue-500/30">
+                    <Pause className="w-10 h-10 text-blue-500" />
+                  </div>
+                </div>
+                <h2 className="text-3xl font-bold mb-2 tracking-tight">{t('sysOffline')}</h2>
+                <p className="text-gray-400 mb-8">{t('subtitle')}</p>
+
+                <div className="flex flex-col gap-4">
+                  <button
+                    onClick={togglePause}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Play className="w-5 h-5" />
+                    {t('resume')}
+                  </button>
+                  <button
+                    onClick={() => setGameState('menu')}
+                    className="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 border border-gray-700"
+                  >
+                    <ArrowLeft className="w-5 h-5" />
+                    {t('returnMenu')}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
         </AnimatePresence>
       </div>
 
@@ -979,6 +1063,7 @@ export default function Game() {
             <section>
               <h4 className="text-sm font-bold text-yellow-400 uppercase tracking-wider mb-3 border-b border-yellow-400/20 pb-2">{t('powerUps')}</h4>
               <div className="space-y-2 text-xs text-gray-400">
+
                 <div className="bg-gray-900 p-2 rounded flex items-start gap-2">
                   <span className="text-emerald-400 font-bold shrink-0">{t('slowPowerName')}</span>
                   <span>{t('slowPowerDesc')}</span>

@@ -1,6 +1,6 @@
 // src/LanguageContext.tsx
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import translations, { type Lang, type TranslationKey } from './i18n';
 
 interface LanguageContextType {
@@ -27,6 +27,14 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
             return next;
         });
     };
+
+    useEffect(() => {
+        if (lang === 'km') {
+            document.documentElement.classList.add('lang-km');
+        } else {
+            document.documentElement.classList.remove('lang-km');
+        }
+    }, [lang]);
 
     const t = (key: TranslationKey): string => translations[lang][key];
 

@@ -1,1 +1,30 @@
 @import "tailwindcss";
+
+@theme {
+  --font-inter: "Inter", sans-serif;
+  --font-kantumruy: "Kantumruy Pro", sans-serif;
+}
+
+:root {
+  font-family: var(--font-inter);
+}
+
+:root.lang-km {
+  font-family: var(--font-kantumruy);
+}
+
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure font-mono doesn't override the primary font for text */
+.font-mono {
+  font-family: inherit !important;
+}
+
+/* Use actual mono for numbers context if needed */
+.number-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+}

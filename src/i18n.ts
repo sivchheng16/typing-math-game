@@ -20,7 +20,7 @@ const translations = {
         doubleScore: '2X SCORE',
 
         // ── Main Menu ───────────────────────────────────────────
-        sysInit: 'Mathematics',
+        sysInit: 'Typing Math Game',
         subtitle: 'Solve fast — type the answer before time runs out!',
         cpuOverload: 'Calculate Numbers',
         dataStream: 'Speed Type',
@@ -40,6 +40,8 @@ const translations = {
         escMenu: 'Menu',
         restart: 'Restart',
         mute: 'Mute',
+        pause: 'Pause',
+        resume: 'Resume',
 
         // ── Reference Panel ──────────────────────────────────────
         referenceTitle: 'Guide',
@@ -127,13 +129,13 @@ const translations = {
         doubleScore: 'x2 ពិន្ទុ',
 
         // ── Main Menu ───────────────────────────────────────────
-        sysInit: 'គណិតវិទ្យា',
-        subtitle: 'ដោះស្រាយឱ្យលើន! វាយចម្លើយមុនពេលអស់ពេល!',
+        sysInit: 'ហ្គេមវាយគណិតវិទ្យា',
+        subtitle: 'ដោះស្រាយឱ្យលឿន! វាយចម្លើយមុនពេលអស់ពេល!',
         cpuOverload: 'គណនាលេខ',
         dataStream: 'វាយលឿន',
         highScore: 'ពិន្ទុខ្ពស់បំផុត',
         cpuDesc: 'លេខនឹងធ្លាក់ពីខាងលើ។ វាយចម្លើយមុនពេលវាដល់ខាងក្រោម! លេខកាន់តែធំ គណិតកាន់តែពិបាក។',
-        streamDesc: 'លេខនឹងធ្លាក់ពីខាងលើ។ វាយលេខនីមួយៗមុនពេលវាដល់ខាងក្រោម! មិនចំបាច់គិតទេ គ្រាន់តែលើន និងមើលច្បាស់!',
+        streamDesc: 'លេខនឹងធ្លាក់ពីខាងលើ។ វាយលេខនីមួយៗមុនពេលវាដល់ខាងក្រោម! មិនចំបាច់គិតទេ គ្រាន់តែលឿន និងមើលច្បាស់!',
         easy: 'ងាយ',
         medium: 'មធ្យម',
         hard: 'ពិបាក',
@@ -147,6 +149,8 @@ const translations = {
         escMenu: 'ម៉ឺនុយ',
         restart: 'ចាប់ផ្ដើមម្ដងទៀត',
         mute: 'បិទសំឡេង',
+        pause: 'ផ្អាក',
+        resume: 'បន្ត',
 
         // ── Reference Panel ──────────────────────────────────────
         referenceTitle: 'ការណែនាំ',
@@ -199,7 +203,7 @@ const translations = {
 
         // Tutorial step content
         t1Content: 'សូមស្វាគមន៍! លេខនឹងធ្លាក់ពីខាងលើ។ វាយចម្លើយឱ្យត្រឹមត្រូវ មុនពេលវាដល់ខាងក្រោម។',
-        t2Content: 'ដាក់ម្រាមដៃនៅលើជួរកណ្តាលនៃក្តារចុច (A-S-D-F និង J-K-L-;)។ នេះជាទីតាំងចាប់ផ្ដើមសម្រាប់ការវាយលើន។',
+        t2Content: 'ដាក់ម្រាមដៃនៅលើជួរកណ្តាលនៃក្តារចុច (A-S-D-F និង J-K-L-;)។ នេះជាទីតាំងចាប់ផ្ដើមសម្រាប់ការវាយលឿន។',
         t3Content: 'លើកម្រាមដៃពីជួរកណ្តាលទៅវាយលេខ (1-0)។ ព្យាយាមមើលលើអេក្រង់ កុំមើលដៃ!',
         t4Content: 'វាយលេខនីមួយៗដោយប្រើម្រាមដៃឆ្វេងឱ្យត្រឹមត្រូវ។ ប៊ូតុងដែលភ្លឺបង្ហាញគោលដៅដែលអ្នកត្រូវចុច។',
         t5Content: 'ឥឡូវប្រើដៃស្ដាំវិញ។ វាយលេខនៅពេលវាភ្លឺ — ដាក់ម្រាមដៃមកជួរកណ្តាលវិញរាល់ពេលវាយរួច។',

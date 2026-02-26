@@ -1,5 +1,5 @@
 {
-  "name": "CPU Overload",
+  "name": "Typing Math Game",
   "description": "A fast-paced math and logic game where you act as the CPU processing instructions before the buffer overflows.",
   "requestFramePermissions": []
 }
