@@ -386,6 +386,7 @@ export default function Tutorial({ onComplete, onExit }: TutorialProps) {
 
   const inputRef = useRef<HTMLInputElement>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
+  const typingBufferRef = useRef<AudioBuffer | null>(null);
 
   const step = STEPS[currentStep];
 
@@ -430,7 +431,38 @@ export default function Tutorial({ onComplete, onExit }: TutorialProps) {
 
   useEffect(() => {
     if (inputRef.current) inputRef.current.focus();
-  }, [currentStep]);
+
+    // Auto-focus interval every 2s during sequence typing steps
+    if (step.action === "type_sequence") {
+      const interval = setInterval(() => {
+        if (document.activeElement !== inputRef.current) {
+          inputRef.current?.focus();
+        }
+      }, 2000);
+      return () => clearInterval(interval);
+    }
+  }, [currentStep, step.action]);
+
+  useEffect(() => {
+    const loadSound = async () => {
+      try {
+        if (!audioContextRef.current) {
+          audioContextRef.current = new (
+            window.AudioContext || (window as any).webkitAudioContext
+          )();
+        }
+        const response = await fetch("sounds/typing.mp3");
+        const arrayBuffer = await response.arrayBuffer();
+        const audioBuffer = await audioContextRef.current.decodeAudioData(
+          arrayBuffer
+        );
+        typingBufferRef.current = audioBuffer;
+      } catch (error) {
+        console.error("Failed to load typing sound in tutorial:", error);
+      }
+    };
+    loadSound();
+  }, []);
 
   // Sound Effects
   const playSound = (type: "type" | "correct" | "error" | "step") => {
@@ -456,23 +488,32 @@ export default function Tutorial({ onComplete, onExit }: TutorialProps) {
 
     switch (type) {
       case "type":
-        osc.type = "square";
-        osc.frequency.setValueAtTime(600, now);
-        osc.frequency.exponentialRampToValueAtTime(300, now + 0.05);
-        gain.gain.setValueAtTime(0.05, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
-        osc.start(now);
-        osc.stop(now + 0.05);
+        if (typingBufferRef.current) {
+          const source = ctx.createBufferSource();
+          source.buffer = typingBufferRef.current;
+          source.connect(gain);
+          gain.gain.setValueAtTime(0.15, now);
+          source.start(now);
+        }
+        else {
+          osc.type = "square";
+          osc.frequency.setValueAtTime(600, now);
+          osc.frequency.exponentialRampToValueAtTime(300, now + 0.05);
+          gain.gain.setValueAtTime(0.05, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+          osc.start(now);
+          osc.stop(now + 0.05);
+        }
         break;
-      case "correct":
-        osc.type = "sine";
-        osc.frequency.setValueAtTime(440, now); // A4
-        osc.frequency.setValueAtTime(554.37, now + 0.1); // C#5
-        gain.gain.setValueAtTime(0.1, now);
-        gain.gain.linearRampToValueAtTime(0, now + 0.3);
-        osc.start(now);
-        osc.stop(now + 0.3);
-        break;
+      // case "correct":
+      //   osc.type = "sine";
+      //   osc.frequency.setValueAtTime(440, now); // A4
+      //   osc.frequency.setValueAtTime(554.37, now + 0.1); // C#5
+      //   gain.gain.setValueAtTime(0.1, now);
+      //   gain.gain.linearRampToValueAtTime(0, now + 0.3);
+      //   osc.start(now);
+      //   osc.stop(now + 0.3);
+      //   break;
       case "error":
         osc.type = "sawtooth";
         osc.frequency.setValueAtTime(150, now);
@@ -482,15 +523,15 @@ export default function Tutorial({ onComplete, onExit }: TutorialProps) {
         osc.start(now);
         osc.stop(now + 0.2);
         break;
-      case "step":
-        osc.type = "sine";
-        osc.frequency.setValueAtTime(220, now);
-        osc.frequency.exponentialRampToValueAtTime(880, now + 0.3);
-        gain.gain.setValueAtTime(0.1, now);
-        gain.gain.linearRampToValueAtTime(0, now + 0.3);
-        osc.start(now);
-        osc.stop(now + 0.3);
-        break;
+      // case "step":
+      //   osc.type = "sine";
+      //   osc.frequency.setValueAtTime(220, now);
+      //   osc.frequency.exponentialRampToValueAtTime(880, now + 0.3);
+      //   gain.gain.setValueAtTime(0.1, now);
+      //   gain.gain.linearRampToValueAtTime(0, now + 0.3);
+      //   osc.start(now);
+      //   osc.stop(now + 0.3);
+      //   break;
     }
   };
 
@@ -518,7 +559,7 @@ export default function Tutorial({ onComplete, onExit }: TutorialProps) {
 
     // Only allow correct character
     if (inputChar === target) {
-      playSound("correct");
+      playSound("type");
       setInput("");
       setIsError(false);
       if (sequenceIndex + 1 >= step.sequence!.length) {

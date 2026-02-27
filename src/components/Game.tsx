@@ -212,6 +212,8 @@ export default function Game() {
       stream: { easy: 0, medium: 0, hard: 0 }
     };
   });
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const typingBufferRef = useRef<AudioBuffer | null>(null);
 
   const togglePause = useCallback(() => {
     setGameState(prev => {
@@ -221,8 +223,25 @@ export default function Game() {
     });
   }, []);
 
-  // Update current time for UI timers
+  // Preload typing sound
   useEffect(() => {
+    const loadSound = async () => {
+      try {
+        if (!audioContextRef.current) {
+          audioContextRef.current = new (
+            window.AudioContext || (window as any).webkitAudioContext
+          )();
+        }
+        const response = await fetch('sounds/typing.mp3');
+        const arrayBuffer = await response.arrayBuffer();
+        const audioBuffer = await audioContextRef.current.decodeAudioData(arrayBuffer);
+        typingBufferRef.current = audioBuffer;
+      } catch (error) {
+        console.error('Failed to load typing sound:', error);
+      }
+    };
+    loadSound();
+
     const interval = setInterval(() => setCurrentTime(Date.now()), 100);
     return () => clearInterval(interval);
   }, []);
@@ -290,7 +309,7 @@ export default function Game() {
       switch (e.key) {
         case 'Escape':
           if (gameState !== 'menu') {
-            setGameState('menu');
+            goToMenu();
           }
           break;
         // case 'r':
@@ -316,10 +335,115 @@ export default function Game() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [gameState]);
 
-  // Auto-focus input when game starts
+  // Sound Effects
+  const playSound = (type: 'type' | 'correct' | 'error' | 'level-up' | 'game-over' | 'powerup') => {
+    if (!soundEnabled) return;
+
+    if (!audioContextRef.current) {
+      audioContextRef.current = new (
+        window.AudioContext || (window as any).webkitAudioContext
+      )();
+    }
+    const ctx = audioContextRef.current;
+
+    // Resume context if suspended (browser policy)
+    if (ctx.state === 'suspended') {
+      ctx.resume();
+    }
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    const now = ctx.currentTime;
+
+    switch (type) {
+      case 'type':
+        if (typingBufferRef.current) {
+          const source = ctx.createBufferSource();
+          source.buffer = typingBufferRef.current;
+          source.connect(gain);
+          gain.gain.setValueAtTime(0.15, now);
+          source.start(now);
+        } else {
+          // Fallback to synth if buffer not loaded
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(400 + Math.random() * 100, now);
+          osc.frequency.exponentialRampToValueAtTime(100, now + 0.05);
+          gain.gain.setValueAtTime(0.04, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+          osc.start(now);
+          osc.stop(now + 0.05);
+        }
+        break;
+      // case 'correct':
+      //   osc.type = 'sine';
+      //   osc.frequency.setValueAtTime(523.25, now); // C5
+      //   osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+      //   osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
+      //   gain.gain.setValueAtTime(0.1, now);
+      //   gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+      //   osc.start(now);
+      //   osc.stop(now + 0.3);
+      //   break;
+      case 'error':
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, now);
+        osc.frequency.linearRampToValueAtTime(100, now + 0.15);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
+        osc.start(now);
+        osc.stop(now + 0.15);
+        break;
+      case 'level-up':
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(261.63, now); // C4
+        osc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.5); // C6
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+        osc.start(now);
+        osc.stop(now + 0.5);
+        break;
+      case 'game-over':
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(300, now);
+        osc.frequency.linearRampToValueAtTime(50, now + 1);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 1);
+        osc.start(now);
+        osc.stop(now + 1);
+        break;
+      case 'powerup':
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.exponentialRampToValueAtTime(880, now + 0.2);
+        osc.frequency.exponentialRampToValueAtTime(440, now + 0.4);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+        osc.start(now);
+        osc.stop(now + 0.4);
+        break;
+    }
+  };
+
   useEffect(() => {
     if (gameState === 'playing' && inputRef.current) {
       inputRef.current.focus();
+    }
+    if (gameState === 'gameover') {
+      playSound('game-over');
+    }
+
+    // Auto-focus interval every 2s
+    if (gameState === 'playing') {
+      const interval = setInterval(() => {
+        if (document.activeElement !== inputRef.current) {
+          inputRef.current?.focus();
+        }
+      }, 2000);
+      return () => clearInterval(interval);
     }
   }, [gameState]);
 
@@ -346,10 +470,15 @@ export default function Game() {
       setInputError(true);
       setTimeout(() => setInputError(false), 300);
       setInputValue('');
+      playSound('error');
       return;
     }
 
     setInputValue(val);
+
+    if (val !== '') {
+      playSound('type');
+    }
 
     const matchIndex = tasks.findIndex((t) => t.answer === trimmedVal);
 
@@ -369,6 +498,9 @@ export default function Game() {
           ...prev,
           [task.powerUp!]: now + duration
         }));
+        playSound('powerup');
+      } else {
+        playSound('correct');
       }
 
       // Apply health recovery
@@ -383,6 +515,7 @@ export default function Game() {
       if ((stateRef.current.score + points) > stateRef.current.level * 500) {
         setLevel((prev) => prev + 1);
         setHealth((prev) => Math.min(prev + 20, 100)); // Heal on level up
+        playSound('level-up');
       }
 
       // Remove task
@@ -628,6 +761,17 @@ export default function Game() {
     setGameState('playing');
   }, []);
 
+  const goToMenu = useCallback(() => {
+    setScore(0);
+    setHealth(100);
+    setLevel(1);
+    setInputValue('');
+    setActiveEffects({ slow: 0, shield: 0, double: 0 });
+    stateRef.current.tasks = [];
+    stateRef.current.particles = [];
+    setGameState('menu');
+  }, []);
+
   return (
     <div className="flex flex-col h-screen w-full bg-[#0a0a0a] text-white font-mono overflow-hidden gap-2">
       {/* Navbar */}
@@ -635,7 +779,7 @@ export default function Game() {
         <div className="flex items-center gap-6">
           {/* {gameState !== 'menu' && (
             <button
-              onClick={() => setGameState('menu')}
+              onClick={goToMenu}
               className="bg-[#0a0a0a] border border-gray-700 p-2 rounded-lg flex items-center gap-2 hover:bg-gray-800 transition-colors text-gray-400 hover:text-white"
               title={t('backToMenu')}
             >
@@ -647,7 +791,7 @@ export default function Game() {
           <div className="flex items-center gap-3 pr-6 border-r border-gray-800">
             <div className="bg-blue-500/10 p-2 rounded-lg border border-blue-500/20">
               <img
-                src="/typing-math-game-logo.png"
+                src="typing-math-game-logo.png"
                 alt="Logo"
                 className="w-6 h-6 object-contain"
               />
@@ -844,7 +988,7 @@ export default function Game() {
               <div className="relative bg-[#151619] border border-gray-700 p-8 rounded-2xl max-w-2xl w-full text-center shadow-2xl">
                 <div className="mb-6 flex justify-center">
                   <img
-                    src="/typing-math-game-logo.png"
+                    src="typing-math-game-logo.png"
                     alt="Typing Math Game Logo"
                     className="w-48 h-auto object-contain drop-shadow-[0_0_15px_rgba(34,211,238,0.4)]"
                   />
@@ -945,8 +1089,8 @@ export default function Game() {
 
           {gameState === 'tutorial' && (
             <Tutorial
-              onComplete={() => setGameState('menu')}
-              onExit={() => setGameState('menu')}
+              onComplete={goToMenu}
+              onExit={goToMenu}
             />
           )}
 
@@ -998,7 +1142,7 @@ export default function Game() {
                   </button>
 
                   <button
-                    onClick={() => setGameState('menu')}
+                    onClick={goToMenu}
                     className="w-full bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all"
                   >
                     <ArrowLeft className="w-5 h-5" />
@@ -1033,8 +1177,8 @@ export default function Game() {
                     {t('resume')}
                   </button>
                   <button
-                    onClick={() => setGameState('menu')}
-                    className="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 border border-gray-700"
+                    onClick={goToMenu}
+                    className="flex-1 bg-gray-800/50 border border-white/10 p-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-gray-800 transition-all text-gray-400"
                   >
                     <ArrowLeft className="w-5 h-5" />
                     {t('returnMenu')}
