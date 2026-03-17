@@ -308,8 +308,8 @@ export default function Game() {
 
       switch (e.key) {
         case 'Escape':
-          if (gameState !== 'menu') {
-            goToMenu();
+          if (gameState === 'playing' || gameState === 'paused') {
+            togglePause();
           }
           break;
         // case 'r':
@@ -774,155 +774,173 @@ export default function Game() {
 
   return (
     <div className="flex flex-col h-screen w-full bg-[#0a0a0a] text-white font-mono overflow-hidden gap-2">
-      {/* Navbar */}
-      <nav className="bg-[#151619] border-b border-gray-800 p-4 flex justify-between items-center shrink-0 z-30 shadow-md">
-        <div className="flex items-center gap-6">
-          {/* {gameState !== 'menu' && (
-            <button
-              onClick={goToMenu}
-              className="bg-[#0a0a0a] border border-gray-700 p-2 rounded-lg flex items-center gap-2 hover:bg-gray-800 transition-colors text-gray-400 hover:text-white"
-              title={t('backToMenu')}
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-          )} */}
-
-          {/* Logo & Name */}
-          <div className="flex items-center gap-3 pr-6 border-r border-gray-800">
-            <div className="bg-blue-500/10 p-2 rounded-lg border border-blue-500/20">
-              <img
-                src="typing-math-game-logo.png"
-                alt="Logo"
-                className="w-6 h-6 object-contain"
-              />
-
-            </div>
-
-            <span className="font-bold text-lg tracking-tight hidden md:block">
-              {t('sysInit')}
-            </span>
-          </div>
-
-          {/* Score */}
-          <div className="flex items-center gap-3">
-            <div className="bg-blue-500/10 p-2 rounded-lg border border-blue-500/20">
-              <Terminal className="text-blue-500 w-5 h-5" />
-            </div>
-            <div>
-              <div className="text-[10px] text-gray-500 uppercase tracking-wider font-bold">{t('score')}</div>
-              <div className="text-xl font-bold leading-none">{score.toString().padStart(6, '0')}</div>
-            </div>
-          </div>
-
-          {/* Level */}
-          <div className="flex items-center gap-3 border-l border-gray-800 pl-6">
-            <div className="bg-purple-500/10 p-2 rounded-lg border border-purple-500/20">
-              <Cpu className="text-purple-500 w-5 h-5" />
-            </div>
-            <div className="min-w-[100px]">
-              <div className="flex justify-between items-baseline mb-1">
-                <div className="text-[10px] text-gray-500 uppercase tracking-wider font-bold">{t('level')} {level}</div>
-                <div className="text-[10px] text-gray-400 font-mono" title="Points to next level">
-                  {score - (level - 1) * 500}/{500} XP
-                </div>
-              </div>
-              <div className="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden">
-                <div
-                  className="bg-purple-500 h-full transition-all duration-300"
-                  style={{ width: `${Math.min(100, Math.max(0, ((score - (level - 1) * 500) / 500) * 100))}%` }}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3">
-          {/* Pause Toggle */}
-          {(gameState === 'playing' || gameState === 'paused') && (
-            <button
-              onClick={togglePause}
-              className="p-2 rounded-lg border border-gray-800 hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
-              title={gameState === 'playing' ? t('pause') : t('resume')}
-            >
-              {gameState === 'playing' ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
-            </button>
-          )}
-
-          {/* Sound Toggle */}
-          <button
-            onClick={() => setSoundEnabled(!soundEnabled)}
-            className="p-2 rounded-lg border border-gray-800 hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
-            title={soundEnabled ? t('soundOn') : t('soundOff')}
+      <AnimatePresence>
+        {gameState !== 'menu' && (
+          <motion.nav
+            initial={{ y: -100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -100, opacity: 0 }}
+            transition={{ type: 'spring', damping: 20, stiffness: 100 }}
+            className="fixed top-0 left-0 right-0 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-white/5 p-4 flex justify-between items-center shrink-0 z-50 shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
           >
-            {soundEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
-          </button>
-
-          {/* Language Toggle */}
-          <button
-            onClick={toggleLang}
-            className="p-2 rounded-lg border border-gray-800 hover:bg-gray-800 text-gray-400 hover:text-white transition-colors text-xs font-bold tracking-wider min-w-[40px]"
-            title={lang === 'en' ? 'Switch to Khmer' : 'Switch to English'}
-          >
-            {lang === 'en' ? '🇰🇭' : '🇬🇧'} <span className="ml-0.5">{t('langLabel')}</span>
-          </button>
-
-          {/* Active Power-ups */}
-          <div className="flex gap-2">
-            {activeEffects.slow > currentTime && (
-              <div className="bg-emerald-900/80 border border-emerald-500/50 px-3 py-1.5 rounded-lg flex flex-col items-center gap-1 shadow-lg backdrop-blur-sm min-w-[80px]">
-                <div className="text-emerald-400 font-bold text-[10px]">{t('slow')}</div>
-                <div className="w-full bg-emerald-900/50 h-1 rounded-full overflow-hidden">
-                  <div
-                    className="bg-emerald-400 h-full transition-all duration-100"
-                    style={{ width: `${Math.min(100, Math.max(0, (activeEffects.slow - currentTime) / 100))}%` }}
+            <div className="flex items-center gap-6">
+              {/* Logo & Name */}
+              <div className="flex items-center gap-3 pr-6 border-r border-white/10">
+                <div className="bg-cyan-500/10 p-2 rounded-xl border border-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.1)]">
+                  <img
+                    src="typing-math-game-logo.png"
+                    alt="Logo"
+                    className="w-6 h-6 object-contain"
                   />
                 </div>
+                <span className="font-bold text-lg tracking-tight hidden md:block bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+                  {t('sysInit')}
+                </span>
               </div>
-            )}
-            {activeEffects.shield > currentTime && (
-              <div className="bg-blue-900/80 border border-blue-500/50 px-3 py-1.5 rounded-lg flex flex-col items-center gap-1 shadow-lg backdrop-blur-sm min-w-[80px]">
-                <div className="text-blue-400 font-bold text-[10px]">{t('shield')}</div>
-                <div className="w-full bg-blue-900/50 h-1 rounded-full overflow-hidden">
-                  <div
-                    className="bg-blue-400 h-full transition-all duration-100"
-                    style={{ width: `${Math.min(100, Math.max(0, (activeEffects.shield - currentTime) / 100))}%` }}
-                  />
-                </div>
-              </div>
-            )}
-            {activeEffects.double > currentTime && (
-              <div className="bg-amber-900/90 border border-amber-500 px-3 py-1.5 rounded-lg flex flex-col items-center gap-1 shadow-[0_0_15px_rgba(251,191,36,0.4)] backdrop-blur-sm min-w-[100px] animate-pulse">
-                <div className="flex items-center gap-1">
-                  <Zap className="w-3 h-3 text-amber-400 fill-amber-400" />
-                  <div className="text-amber-400 font-bold text-[10px]">{t('doubleScore')}</div>
-                </div>
-                <div className="w-full bg-amber-900/50 h-1 rounded-full overflow-hidden mt-0.5">
-                  <div
-                    className="bg-amber-400 h-full transition-all duration-100"
-                    style={{ width: `${Math.min(100, Math.max(0, (activeEffects.double - currentTime) / 100))}%` }}
-                  />
-                </div>
-              </div>
-            )}
-          </div>
 
-          {/* Health */}
-          <div className="flex items-center gap-3 border-l border-gray-800 pl-6">
-            <div className={`p-2 rounded-lg border ${health < 30 ? 'bg-red-500/10 border-red-500/20' : 'bg-green-500/10 border-green-500/20'}`}>
-              <HeartPulse className={`${health < 30 ? 'text-red-500 animate-pulse' : 'text-green-500'} w-5 h-5`} />
-            </div>
-            <div className="w-32">
-              <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 font-bold">{t('bufferIntegrity')}</div>
-              <div className="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
-                <div
-                  className={`h-full transition-all duration-300 ${health < 30 ? 'bg-red-500' : 'bg-green-500'}`}
-                  style={{ width: `${health}%` }}
-                />
+              {/* Score */}
+              <div className="flex items-center gap-3">
+                <div className="bg-blue-500/10 p-2 rounded-xl border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.1)]">
+                  <Terminal className="text-blue-400 w-5 h-5" />
+                </div>
+                <div>
+                  <div className="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold">{t('score')}</div>
+                  <div className="text-xl font-bold font-mono text-blue-50">{score.toString().padStart(6, '0')}</div>
+                </div>
+              </div>
+
+              {/* Level */}
+              <div className="flex items-center gap-3 border-l border-white/10 pl-6">
+                <div className="bg-purple-500/10 p-2 rounded-xl border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
+                  <Cpu className="text-purple-400 w-5 h-5" />
+                </div>
+                <div className="min-w-[120px]">
+                  <div className="flex justify-between items-baseline mb-1">
+                    <div className="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold">{t('level')} {level}</div>
+                    <div className="text-[10px] text-purple-400/70 font-mono">
+                      {score - (level - 1) * 500}/{500} XP
+                    </div>
+                  </div>
+                  <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden border border-white/5">
+                    <motion.div
+                      className="bg-gradient-to-r from-purple-600 to-purple-400 h-full shadow-[0_0_10px_rgba(168,85,247,0.5)]"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${Math.min(100, Math.max(0, ((score - (level - 1) * 500) / 500) * 100))}%` }}
+                      transition={{ type: 'spring', bounce: 0 }}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      </nav>
+
+            <div className="flex items-center gap-4">
+              {/* Active Power-ups */}
+              <div className="flex gap-2">
+                <AnimatePresence>
+                  {activeEffects.slow > currentTime && (
+                    <motion.div
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0, opacity: 0 }}
+                      className="bg-emerald-500/10 border border-emerald-500/30 px-3 py-1.5 rounded-xl flex flex-col items-center gap-1 backdrop-blur-md min-w-[80px]"
+                    >
+                      <div className="text-emerald-400 font-bold text-[10px] uppercase tracking-wider">{t('slow')}</div>
+                      <div className="w-full bg-emerald-950/50 h-1 rounded-full overflow-hidden">
+                        <div
+                          className="bg-emerald-400 h-full shadow-[0_0_8px_rgba(52,211,153,0.5)]"
+                          style={{ width: `${Math.min(100, Math.max(0, (activeEffects.slow - currentTime) / 100))}%` }}
+                        />
+                      </div>
+                    </motion.div>
+                  )}
+                  {activeEffects.shield > currentTime && (
+                    <motion.div
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0, opacity: 0 }}
+                      className="bg-blue-500/10 border border-blue-500/30 px-3 py-1.5 rounded-xl flex flex-col items-center gap-1 backdrop-blur-md min-w-[80px]"
+                    >
+                      <div className="text-blue-400 font-bold text-[10px] uppercase tracking-wider">{t('shield')}</div>
+                      <div className="w-full bg-blue-950/50 h-1 rounded-full overflow-hidden">
+                        <div
+                          className="bg-blue-400 h-full shadow-[0_0_8px_rgba(96,165,250,0.5)]"
+                          style={{ width: `${Math.min(100, Math.max(0, (activeEffects.shield - currentTime) / 100))}%` }}
+                        />
+                      </div>
+                    </motion.div>
+                  )}
+                  {activeEffects.double > currentTime && (
+                    <motion.div
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0, opacity: 0 }}
+                      className="bg-amber-500/10 border border-amber-500/40 px-3 py-1.5 rounded-xl flex flex-col items-center gap-1 backdrop-blur-md min-w-[100px] shadow-[0_0_15px_rgba(251,191,36,0.1)]"
+                    >
+                      <div className="flex items-center gap-1">
+                        <Zap className="w-3 h-3 text-amber-400 fill-amber-400" />
+                        <div className="text-amber-400 font-bold text-[10px] uppercase tracking-wider">{t('doubleScore')}</div>
+                      </div>
+                      <div className="w-full bg-amber-950/50 h-1 rounded-full overflow-hidden mt-0.5">
+                        <div
+                          className="bg-amber-400 h-full shadow-[0_0_8px_rgba(251,191,36,0.5)]"
+                          style={{ width: `${Math.min(100, Math.max(0, (activeEffects.double - currentTime) / 100))}%` }}
+                        />
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Health */}
+              <div className="flex items-center gap-3 border-l border-white/10 pl-6">
+                <div className={`p-2 rounded-xl border transition-colors ${health < 30 ? 'bg-red-500/10 border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.2)]' : 'bg-green-500/10 border-green-500/20'}`}>
+                  <HeartPulse className={`${health < 30 ? 'text-red-500 animate-pulse' : 'text-green-500'} w-5 h-5`} />
+                </div>
+                <div className="w-32">
+                  <div className="text-[10px] text-gray-500 uppercase tracking-[0.2em] mb-1 font-bold">{t('bufferIntegrity')}</div>
+                  <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden border border-white/5">
+                    <motion.div
+                      className={`h-full shadow-[0_0_10px_rgba(34,197,94,0.3)] ${health < 30 ? 'bg-red-500 shadow-red-500/50' : 'bg-green-500'}`}
+                      initial={{ width: '100%' }}
+                      animate={{ width: `${health}%` }}
+                      transition={{ type: 'spring', bounce: 0 }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Controls */}
+              <div className="flex items-center gap-2 border-l border-white/10 pl-4">
+                {(gameState === 'playing' || gameState === 'paused') && (
+                  <button
+                    onClick={togglePause}
+                    className="p-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-gray-400 hover:text-white transition-all hover:scale-105 active:scale-95"
+                    title={gameState === 'playing' ? t('pause') : t('resume')}
+                  >
+                    {gameState === 'playing' ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                  </button>
+                )}
+
+                <button
+                  onClick={() => setSoundEnabled(!soundEnabled)}
+                  className="p-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-gray-400 hover:text-white transition-all hover:scale-105 active:scale-95"
+                  title={soundEnabled ? t('soundOn') : t('soundOff')}
+                >
+                  {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+                </button>
+
+                <button
+                  onClick={toggleLang}
+                  className="px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-gray-400 hover:text-white transition-all hover:scale-105 active:scale-95 text-xs font-bold tracking-tight"
+                >
+                  <span className="opacity-70">{lang === 'en' ? '🇰🇭' : '🇬🇧'}</span>
+                  <span className="ml-1.5">{t('langLabel')}</span>
+                </button>
+              </div>
+            </div>
+          </motion.nav>
+        )}
+      </AnimatePresence>
 
       {/* Main Game Area */}
       <div className="relative flex-1 flex flex-col items-center justify-center p-4 pb-2  overflow-hidden bg-[#0a0a0a]">
@@ -969,10 +987,10 @@ export default function Game() {
 
           {/* Keyboard Shortcuts Hint */}
           <div className="flex justify-center gap-6  mt-3 text-[10px] text-gray-500 font-mono uppercase tracking-wider">
-            <span className="flex items-center gap-1"><kbd className="bg-gray-800 px-1.5 py-0.5 rounded border border-gray-700 text-gray-300">ESC</kbd> {t('escMenu')}</span>
-            <span className="flex items-center gap-1"><kbd className="bg-gray-800 px-1.5 py-0.5 rounded border border-gray-700 text-gray-300">SHIFT + R</kbd> {t('restart')}</span>
-            <span className="flex items-center gap-1"><kbd className="bg-gray-800 px-1.5 py-0.5 rounded border border-gray-700 text-gray-300">SHIFT + M</kbd> {t('mute')}</span>
-            <span className="flex items-center gap-1"><kbd className="bg-gray-800 px-1.5 py-0.5 rounded border border-gray-700 text-gray-300">SHIFT + P</kbd> {t('pause')}</span>
+            <span className="flex items-center gap-1"><kbd className="bg-gray-800 px-1.5 py-0.5 rounded border border-gray-700 text-gray-300 font-bold">ESC</kbd> {t('pause')}</span>
+            <span className="flex items-center gap-1"><kbd className="bg-gray-800 px-1.5 py-0.5 rounded border border-gray-700 text-gray-300 font-bold">SHIFT + R</kbd> {t('restart')}</span>
+            <span className="flex items-center gap-1"><kbd className="bg-gray-800 px-1.5 py-0.5 rounded border border-gray-700 text-gray-300 font-bold">SHIFT + M</kbd> {t('mute')}</span>
+            <span className="flex items-center gap-1"><kbd className="bg-gray-800 px-1.5 py-0.5 rounded border border-gray-700 text-gray-300 font-bold">SHIFT + P</kbd> {t('pause')}</span>
           </div>
         </div>
 
@@ -983,38 +1001,65 @@ export default function Game() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 flex items-center justify-center bg-black/80 z-50 backdrop-blur-sm"
+              className="absolute inset-0 flex items-center justify-center bg-black/80 z-50 backdrop-blur-sm p-4"
             >
-              <div className="relative bg-[#151619] border border-gray-700 p-8 rounded-2xl max-w-2xl w-full text-center shadow-2xl">
-                <div className="mb-6 flex justify-center">
+              <div className="relative bg-[#151619]/90 border border-white/10 p-8 rounded-3xl max-w-2xl w-full text-center shadow-[0_0_50px_rgba(0,0,0,0.5)] backdrop-blur-xl">
+                {/* Top Right Controls */}
+                <div className="absolute top-6 right-6 flex items-center gap-2">
+                  <button
+                    onClick={() => setSoundEnabled(!soundEnabled)}
+                    className="p-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-gray-400 hover:text-white transition-all hover:scale-105 active:scale-95"
+                    title={soundEnabled ? t('soundOn') : t('soundOff')}
+                  >
+                    {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+                  </button>
+
+                  <button
+                    onClick={toggleLang}
+                    className="px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-gray-400 hover:text-white transition-all hover:scale-105 active:scale-95 text-xs font-bold tracking-tight"
+                  >
+                    <span className="opacity-70">{lang === 'en' ? '🇰🇭' : '🇬🇧'}</span>
+                    <span className="ml-1.5">{t('langLabel')}</span>
+                  </button>
+                </div>
+
+                <div className="mb-8 flex justify-center">
                   <img
                     src="typing-math-game-logo.png"
                     alt="Typing Math Game Logo"
-                    className="w-48 h-auto object-contain drop-shadow-[0_0_15px_rgba(34,211,238,0.4)]"
+                    className="w-52 h-auto object-contain drop-shadow-[0_0_20px_rgba(34,211,238,0.3)]"
                   />
                 </div>
-                {/* <h1 className="text-4xl font-bold mb-2 tracking-tight">{t('sysInit')}</h1> */}
-                <p className="text-gray-400 mb-8">{t('subtitle')}</p>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <p className="text-gray-400 mb-10 text-sm tracking-wide">{t('subtitle')}</p>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
                   {/* Data Stream Card */}
                   <button
                     onClick={() => setGameMode('stream')}
-                    className={`p-6 rounded-xl border-2 transition-all text-left text-top group ${gameMode === 'stream'
-                      ? 'border-cyan-500 bg-cyan-500/10 shadow-[0_0_20px_rgba(6,182,212,0.2)]'
-                      : 'border-gray-800 bg-gray-900/50 hover:border-gray-600'
+                    className={`relative overflow-hidden p-6 rounded-2xl border-2 transition-all text-left group ${gameMode === 'stream'
+                      ? 'border-cyan-500 bg-cyan-500/10 shadow-[0_0_30px_rgba(6,182,212,0.15)]'
+                      : 'border-white/5 bg-white/5 hover:border-white/10 hover:bg-white/10'
                       }`}
                   >
-                    <div className="flex items-center gap-3 mb-3">
-                      <Activity className={`w-6 h-6 ${gameMode === 'stream' ? 'text-cyan-400' : 'text-gray-500'}`} />
+                    {gameMode === 'stream' && (
+                      <motion.div
+                        layoutId="mode-glow"
+                        className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-transparent pointer-events-none"
+                      />
+                    )}
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className={`p-2 rounded-lg ${gameMode === 'stream' ? 'bg-cyan-500/20 text-cyan-400' : 'bg-white/5 text-gray-500'}`}>
+                        <Activity className="w-5 h-5" />
+                      </div>
                       <div>
-                        <h3 className={`font-bold text-lg leading-none ${gameMode === 'stream' ? 'text-white' : 'text-gray-300'}`}>{t('dataStream')}</h3>
-                        <div className="text-xs text-gray-500 mt-1 font-mono">
-                          {t('highScore')} ({t(difficulty as 'easy' | 'medium' | 'hard')}): {highScores.stream[difficulty]}
+                        <h3 className={`font-bold text-lg tracking-tight ${gameMode === 'stream' ? 'text-white' : 'text-gray-400'}`}>{t('dataStream')}</h3>
+                        <div className="text-[10px] text-gray-500 mt-0.5 font-mono uppercase tracking-wider">
+                          {t('highScore')}: {highScores.stream[difficulty]}
                         </div>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-500 group-hover:text-gray-400 transition-colors">
+                    <p className="text-xs leading-relaxed text-gray-500 group-hover:text-gray-400 transition-colors">
                       {t('streamDesc')}
                     </p>
                   </button>
@@ -1022,67 +1067,85 @@ export default function Game() {
                   {/* CPU Overload Card */}
                   <button
                     onClick={() => setGameMode('cpu')}
-                    className={`p-6 rounded-xl border-2 transition-all text-left group ${gameMode === 'cpu'
-                      ? 'border-blue-500 bg-blue-500/10 shadow-[0_0_20px_rgba(59,130,246,0.2)]'
-                      : 'border-gray-800 bg-gray-900/50 hover:border-gray-600'
+                    className={`relative overflow-hidden p-6 rounded-2xl border-2 transition-all text-left group ${gameMode === 'cpu'
+                      ? 'border-blue-500 bg-blue-500/10 shadow-[0_0_30px_rgba(59,130,246,0.15)]'
+                      : 'border-white/5 bg-white/5 hover:border-white/10 hover:bg-white/10'
                       }`}
                   >
-                    <div className="flex items-center gap-3 mb-3">
-                      <Calculator className={`w-6 h-6 ${gameMode === 'cpu' ? 'text-blue-400' : 'text-gray-500'}`} />
+                    {gameMode === 'cpu' && (
+                      <motion.div
+                        layoutId="mode-glow"
+                        className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent pointer-events-none"
+                      />
+                    )}
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className={`p-2 rounded-lg ${gameMode === 'cpu' ? 'bg-blue-500/20 text-blue-400' : 'bg-white/5 text-gray-500'}`}>
+                        <Calculator className="w-5 h-5" />
+                      </div>
                       <div>
-                        <h3 className={`font-bold text-lg leading-none ${gameMode === 'cpu' ? 'text-white' : 'text-gray-300'}`}>{t('cpuOverload')}</h3>
-                        <div className="text-xs text-gray-500 mt-1 font-mono">
-                          {t('highScore')} ({t(difficulty as 'easy' | 'medium' | 'hard')}): {highScores.cpu[difficulty]}
+                        <h3 className={`font-bold text-lg tracking-tight ${gameMode === 'cpu' ? 'text-white' : 'text-gray-400'}`}>{t('cpuOverload')}</h3>
+                        <div className="text-[10px] text-gray-500 mt-0.5 font-mono uppercase tracking-wider">
+                          {t('highScore')}: {highScores.cpu[difficulty]}
                         </div>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-500 group-hover:text-gray-400 transition-colors">
+                    <p className="text-xs leading-relaxed text-gray-500 group-hover:text-gray-400 transition-colors">
                       {t('cpuDesc')}
                     </p>
                   </button>
-
                 </div>
 
-                <div className="flex justify-center gap-2 mb-8">
-                  {(['easy', 'medium', 'hard'] as Difficulty[]).map((d) => (
-                    <button
-                      key={d}
-                      onClick={() => setDifficulty(d)}
-                      className={`px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wider transition-all ${difficulty === d
-                        ? 'bg-white text-black shadow-lg scale-105'
-                        : 'bg-gray-800 text-gray-500 hover:bg-gray-700'
-                        }`}
-                    >
-                      {t(d as 'easy' | 'medium' | 'hard')}
-                    </button>
-                  ))}
+                {/* Difficulty Selector */}
+                <div className="flex justify-center mb-10">
+                  <div className="inline-flex p-1.5 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-md">
+                    {(['easy', 'medium', 'hard'] as Difficulty[]).map((d) => (
+                      <button
+                        key={d}
+                        onClick={() => setDifficulty(d)}
+                        className={`px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-[0.15em] transition-all relative z-10 ${difficulty === d
+                          ? 'text-black'
+                          : 'text-gray-500 hover:text-gray-300'
+                          }`}
+                      >
+                        {difficulty === d && (
+                          <motion.div
+                            layoutId="difficulty-bg"
+                            className="absolute inset-0 bg-white rounded-xl -z-10 shadow-lg"
+                            transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                          />
+                        )}
+                        {t(d as 'easy' | 'medium' | 'hard')}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-4">
                   <button
                     onClick={startGame}
-                    className={`w-full font-bold py-4 px-6 rounded-xl flex items-center justify-center gap-2 transition-all transform hover:scale-[1.02] active:scale-[0.98] ${gameMode === 'cpu'
-                      ? 'bg-blue-600 hover:bg-blue-500 text-white'
-                      : 'bg-cyan-600 hover:bg-cyan-500 text-white'
+                    className={`w-full font-bold py-5 px-8 rounded-2xl flex items-center justify-center gap-3 transition-all transform hover:scale-[1.01] active:scale-[0.99] shadow-xl ${gameMode === 'cpu'
+                      ? 'bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white shadow-blue-500/20'
+                      : 'bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-500 hover:to-cyan-400 text-white shadow-cyan-500/20'
                       }`}
                   >
-                    <Play className="w-5 h-5" />
-                    {gameMode === 'cpu' ? t('initCpu') : t('initStream')}
+                    <Play className="w-5 h-5 fill-current" />
+                    <span className="uppercase tracking-[0.1em]">{gameMode === 'cpu' ? t('initCpu') : t('initStream')}</span>
                   </button>
 
                   <button
                     onClick={() => setGameState('tutorial')}
-                    className="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all"
+                    className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white font-bold py-4 px-8 rounded-2xl flex items-center justify-center gap-3 transition-all tracking-[0.1em] uppercase text-sm"
                   >
                     <GraduationCap className="w-5 h-5" />
                     {t('trainingProtocol')}
                   </button>
                 </div>
 
-                <div className="absolute  bottom-1 left-0 right-0 text-[10px] text-gray-600  uppercase tracking-[0.2em]">
-                  &copy; 2026 All rights reserved by KOOMPI
+                <div className="mt-10 pt-6 border-t border-white/5 flex flex-col items-center gap-2">
+                  <div className="text-[10px] text-gray-600 uppercase tracking-[0.3em] font-medium">
+                    &copy; 2026 Powered by KOOMPI
+                  </div>
                 </div>
-
               </div>
             </motion.div>
           )}
@@ -1152,37 +1215,46 @@ export default function Game() {
               </div>
             </motion.div>
           )}
+
           {gameState === 'paused' && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 flex items-center justify-center bg-black/60 z-50 backdrop-blur-md"
+              className="absolute inset-0 flex items-center justify-center bg-black/60 z-50 backdrop-blur-md p-4"
             >
-              <div className="bg-[#151619] border border-gray-700 p-8 rounded-2xl max-w-sm w-full text-center shadow-2xl">
-                <div className="mb-6 flex justify-center">
-                  <div className="w-20 h-20 bg-blue-500/10 rounded-full flex items-center justify-center border border-blue-500/30">
-                    <Pause className="w-10 h-10 text-blue-500" />
+              <div className="relative bg-[#151619]/90 border border-white/10 p-8 rounded-3xl max-w-sm w-full text-center shadow-[0_0_50px_rgba(0,0,0,0.5)] backdrop-blur-xl">
+                <div className="mb-8 flex justify-center">
+                  <div className="w-20 h-20 bg-blue-500/10 rounded-full flex items-center justify-center border border-blue-500/30 shadow-[0_0_20px_rgba(59,130,246,0.2)]">
+                    <Pause className="w-10 h-10 text-blue-500 fill-current opacity-80" />
                   </div>
                 </div>
-                <h2 className="text-3xl font-bold mb-2 tracking-tight">{t('sysOffline')}</h2>
-                <p className="text-gray-400 mb-8">{t('subtitle')}</p>
+
+                <h2 className="text-3xl font-bold mb-2 tracking-tight uppercase text-white">{t('sysOffline')}</h2>
+                <p className="text-gray-400 mb-10 text-sm tracking-wide">{t('subtitle')}</p>
 
                 <div className="flex flex-col gap-4">
                   <button
                     onClick={togglePause}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
+                    className="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-bold py-4 px-6 rounded-2xl transition-all transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 shadow-xl shadow-blue-500/20 uppercase tracking-wider text-sm"
                   >
-                    <Play className="w-5 h-5" />
+                    <Play className="w-5 h-5 fill-current" />
                     {t('resume')}
                   </button>
+
                   <button
                     onClick={goToMenu}
-                    className="flex-1 bg-gray-800/50 border border-white/10 p-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-gray-800 transition-all text-gray-400"
+                    className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-3 transition-all tracking-wider uppercase text-sm"
                   >
                     <ArrowLeft className="w-5 h-5" />
                     {t('returnMenu')}
                   </button>
+                </div>
+
+                <div className="mt-8 pt-6 border-t border-white/5">
+                  <div className="text-[10px] text-gray-500 uppercase tracking-widest font-medium">
+                    {t('pause')} <span className="text-gray-600">|</span> <kbd className="bg-gray-800 px-1.5 py-0.5 rounded border border-gray-700 text-gray-400">ESC</kbd>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -1207,7 +1279,6 @@ export default function Game() {
             <section>
               <h4 className="text-sm font-bold text-yellow-400 uppercase tracking-wider mb-3 border-b border-yellow-400/20 pb-2">{t('powerUps')}</h4>
               <div className="space-y-2 text-xs text-gray-400">
-
                 <div className="bg-gray-900 p-2 rounded flex items-start gap-2">
                   <span className="text-emerald-400 font-bold shrink-0">{t('slowPowerName')}</span>
                   <span>{t('slowPowerDesc')}</span>
@@ -1223,7 +1294,6 @@ export default function Game() {
                 <p className="text-gray-600 text-[10px] pt-1">{t('powerGlowHint')}</p>
               </div>
             </section>
-
           </div>
         </div>
       </div>
