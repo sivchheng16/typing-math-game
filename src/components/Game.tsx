@@ -946,12 +946,12 @@ export default function Game() {
       <div className="relative flex-1 flex flex-col items-center justify-center p-4 pb-2  overflow-hidden bg-[#0a0a0a]">
 
         {/* Canvas Layer */}
-        <div className="relative border-2 border-gray-800 rounded-xl overflow-hidden shadow-2xl bg-[#151619] h-full w-full max-w-5xl aspect-[4/3] max-h-[80vh]">
+        <div className="relative border-2 border-gray-800 rounded-xl overflow-hidden shadow-2xl bg-[#151619] h-full w-full max-w-5xl aspect-[4/3] max-h-[80vh] sm:mt-5 md:mt-10 lg:mt-20">
           <canvas
             ref={canvasRef}
             width={CANVAS_WIDTH}
             height={CANVAS_HEIGHT}
-            className="block w-full h-full object-contain"
+            className="block w-full h-full object-contain mt-10"
           />
 
           {/* Scanline Overlay */}

@@ -1,7 +1,7 @@
 <div align="center">
-  <!-- <img width="1200" height="475" alt="Typing Math Game Banner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" /> -->
+  <!-- <img width="1200" height="475" alt="Typing Math Banner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" /> -->
   
-  # 🔢 Typing Math Game
+  # 🔢 Typing Math
   
   ### *Master your typing speed and mental math in one immersive experience!*
   
@@ -15,14 +15,14 @@
 
 ## 🎮 About the Game
 
-**Typing Math Game** is a fast-paced educational game designed to challenge both your keyboard proficiency and your mathematical calculation speed. Whether you're a student looking to sharpen your skills or a professional wanting to stay sharp, this game provides an engaging way to practice.
+**Typing Math** is a fast-paced educational game designed to challenge both your keyboard proficiency and your mathematical calculation speed. Whether you're a student looking to sharpen your skills or a professional wanting to stay sharp, this game provides an engaging way to practice.
 
 ## ✨ Key Features
 
 - **🌐 Bilingual Support**: Play fully in either **English** or **Khmer**. Switch languages on the fly!
 - **🎹 Mechanical Typing Feedback**: Integrated high-quality mechanical keyboard sound effects from Pixabay for a satisfying, tactile-sounding experience.
 - **🔌 Full Offline Capability**: All assets, including fonts (Inter & Kantumruy Pro) and sounds, are hosted locally. Play anywhere, zero internet required.
-- **🖥️ Desktop App**: Powered by **Electron**, released as a high-performance desktop application for Linux (AppImage).
+- **🖥️ Desktop App**: Powered by **Electron**, released as a high-performance desktop application for Linux (AppImage) and Windows (.exe).
 - **🛡️ Progress Saving**: Automatically tracks your high scores across different modes and difficulties using local storage.
 - **🎓 Interactive Tutorial**: A step-by-step lesson to help new players master the home row and number pad.
 
@@ -62,14 +62,24 @@
   ```
 
 ### Building
-- **Build for Web**:
+- **Linux — AppImage** (Arch Linux / any Linux):
   ```bash
-  npm run build
+  npm run build:linux
   ```
-- **Package for Desktop (Linux/AppImage)**:
+- **Windows — NSIS Installer (.exe)**:
+  ```bash
+  npm run build:win
+  ```
+- **Both platforms at once**:
+  ```bash
+  npm run build:all
+  ```
+- **Default Electron build** (uses configured targets):
   ```bash
   npm run electron:build
   ```
+
+> Output files are placed in the `dist-electron-build/` directory.
 
 ## 👤 Author
 
